@@ -20,6 +20,7 @@ public class UserService {
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
         user.setPhotoUrl(userDTO.getPhotoUrl());
+        System.out.println(userDTO);
 
         userRepository.save(user);
 

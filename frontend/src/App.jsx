@@ -1,66 +1,94 @@
-import { useEffect } from 'react';
-
-const TelegramLoginButton = ({ botName, onAuth }) => {
-    useEffect(() => {
-        const script = document.createElement('script');
-        script.src = "https://telegram.org/js/telegram-widget.js?7";
-        script.async = true;
-        script.setAttribute('data-telegram-login', "AdGramX_bot"); // Имя вашего бота
-        script.setAttribute('data-size', 'large');
-        script.setAttribute('data-auth-url', 'https://your-backend-url.com/api/users/auth'); // URL вашего бэкенда
-        script.setAttribute('data-request-access', 'write');
-        script.setAttribute('data-userpic', 'false'); // Не показывать фото профиля
-        document.body.appendChild(script);
-
-        // Обработчик события для аутентификации
-        window.TelegramLoginWidget = {
-            onAuth: (user) => {
-                // Вызовите функцию обратного вызова с данными пользователя
-                onAuth(user);
-            }
-        };
-
-        return () => {
-            document.body.removeChild(script);
-        };
-    }, [botName, onAuth]);
-
-    return <div id="telegram-login"></div>;
-};
-
-export default TelegramLoginButton;
-/*import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react';
+import TelegramLoginButton from './components/TelegramLoginButton';
+import config from './config/config.js';
 
 function App() {
-  const [count, setCount] = useState(0)
+    const handleTelegramAuth = async (user) => {
+        try {
+            const response = await fetch(`${config.baseUrl}/api/users/auth`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(user),
+            });
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+            if (response.ok) {
+                const data = await response.json();
+                console.log('User data from backend:', data);
+
+                // Сохраняем токен в localStorage
+                localStorage.setItem('jwtToken', data.token);
+
+                alert(`Welcome, ${data.user.firstName}!`);
+            } else {
+                console.error('Error during authentication');
+            }
+        } catch (error) {
+            console.error('Error sending data to backend:', error);
+        }
+    };
+
+    const fetchProtectedData = async () => {
+        const token = localStorage.getItem('jwtToken');
+        if (!token) {
+            alert('You are not authenticated!');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${config.baseUrl}/api/protected/data`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.text();
+                alert(data); // Показываем ответ в alert
+            } else {
+                alert('Error fetching protected data');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    return (
+        <div style={styles.container}>
+            <h1>Login with Telegram</h1>
+            <TelegramLoginButton botName={config.botName} onAuth={handleTelegramAuth} />
+            <button onClick={fetchProtectedData} style={styles.button}>
+                Get Protected Data
+            </button>
+        </div>
+    );
 }
 
-export default App*/
+const styles = {
+    container: {
+        fontFamily: 'Arial, sans-serif',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        margin: 0,
+        backgroundColor: '#f4f4f4',
+        textAlign: 'center',
+    },
+    button: {
+        marginTop: '20px',
+        padding: '10px 20px',
+        fontSize: '16px',
+        cursor: 'pointer',
+        backgroundColor: '#007bff',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '5px',
+        transition: 'background-color 0.3s',
+    },
+};
+
+export default App;

@@ -3,8 +3,9 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
+  baseURL: 'https://fragrantly-allowing-sabertooth.cloudpub.ru',
   server: {
-    allowedHosts: ['bf784428694294.lhr.life'], // Замените на ваш ngrok хост
+    allowedHosts: true, // Замените на ваш ngrok хост
   },
   plugins: [react()],
 })
