@@ -58,3 +58,4 @@ out/
 
 # Static files
 public/static/
+frontend/src/config/config.js
