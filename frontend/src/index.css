@@ -25,9 +25,11 @@ a:hover {
 body {
   margin: 0;
   display: flex;
-  place-items: center;
-  min-width: 320px;
+  justify-content: center; /* Центрирование по горизонтали */
+  align-items: center;     /* Центрирование по вертикали */
   min-height: 100vh;
+  background-color: #1e1f22; /* Чтобы фон был светлый */
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
 h1 {

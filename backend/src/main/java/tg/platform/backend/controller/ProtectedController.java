@@ -14,13 +14,11 @@ public class ProtectedController {
 
     @GetMapping("/data")
     public String getProtectedData(@RequestHeader("Authorization") String token) {
-        // Убираем "Bearer " из токена
-        String jwtToken = token.substring(7);
+        System.out.println("Received token: " + token); // Отладочное сообщение
 
-        // Проверяем токен и получаем имя пользователя
+        String jwtToken = token.substring(7); // Убираем "Bearer "
         String username = jwtUtil.getUsername(jwtToken);
 
-        // Возвращаем защищённые данные
         return "Hello, " + username + "! This is protected data.";
     }
 }

@@ -1,27 +1,41 @@
 package tg.platform.backend.util;
 
 import org.apache.commons.codec.digest.HmacUtils;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TelegramAuthValidator {
 
     public static boolean validate(Map<String, String> authData, String botToken) {
-        // 1. Формируем data_check_string
+        if (!authData.containsKey("hash")) {
+            return false;
+        }
+
+        // Формируем строку data_check_string
         String dataCheckString = authData.entrySet().stream()
-                .filter(entry -> !entry.getKey().equals("hash")) // Исключаем поле hash
-                .sorted(Map.Entry.comparingByKey()) // Сортируем по ключу
-                .map(entry -> entry.getKey() + "=" + entry.getValue()) // Формируем строку "ключ=значение"
-                .collect(Collectors.joining("\n")); // Объединяем с разделителем "\n"
+                .filter(entry -> !entry.getKey().equals("hash"))
+                .sorted(Map.Entry.comparingByKey())
+                .map(entry -> entry.getKey() + "=" + entry.getValue())
+                .collect(Collectors.joining("\n"));
 
-        // 2. Вычисляем secret_key как SHA256 от botToken
-        byte[] secretKey = HmacUtils.hmacSha256(botToken.getBytes(), botToken.getBytes());
+        // Вычисляем secret_key как SHA256(botToken)
+        byte[] secretKey = sha256(botToken);
 
-        // 3. Вычисляем HMAC-SHA256 от data_check_string с использованием secret_key
-        String calculatedHash = HmacUtils.hmacSha256Hex(secretKey, dataCheckString.getBytes());
+        // Вычисляем HMAC-SHA256 от data_check_string с использованием secret_key
+        String calculatedHash = HmacUtils.hmacSha256Hex(secretKey, dataCheckString.getBytes(StandardCharsets.UTF_8));
 
-        // 4. Сравниваем полученный хэш с тем, что пришёл от Telegram
-        String receivedHash = authData.get("hash");
-        return calculatedHash.equals(receivedHash);
+        // Сравниваем полученный хеш с переданным от Telegram
+        return calculatedHash.equals(authData.get("hash"));
+    }
+
+    private static byte[] sha256(String base) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            return digest.digest(base.getBytes(StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            throw new RuntimeException("Error generating SHA-256 hash", e);
+        }
     }
 }
