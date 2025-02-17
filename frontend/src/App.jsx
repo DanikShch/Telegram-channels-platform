@@ -24,7 +24,7 @@ function App() {
 
                 if (data.token) {
                     localStorage.setItem("jwtToken", data.token);
-                    setIsAuthenticated(true); // Устанавливаем авторизацию
+                    setIsAuthenticated(true);
                     console.log("Token saved to localStorage:", data.token);
                 } else {
                     console.error("No token in response:", data);
@@ -40,7 +40,7 @@ function App() {
 
     const handleLogout = () => {
         localStorage.removeItem("jwtToken");
-        setIsAuthenticated(false); // Сбрасываем авторизацию
+        setIsAuthenticated(false);
     };
 
     const fetchProtectedData = async () => {
@@ -75,26 +75,24 @@ function App() {
     useEffect(() => {
         const token = localStorage.getItem("jwtToken");
         if (token) {
-            setIsAuthenticated(true); // Проверяем авторизацию при загрузке
+            setIsAuthenticated(true);
         }
     }, []);
 
     return (
         <Router>
             <Routes>
-                {/* Главная страница */}
                 <Route
                     path="/"
                     element={
                         <div className="app-container">
                             <div className="login-card">
                                 <div className="card-header">
-                                    <h1>via Telegram</h1>
+                                    <h1>AdGram</h1>
                                     <p className="subtitle">Login using your Telegram account</p>
                                 </div>
 
-                                <div className="card-content">
-                                    {/* Кнопка Access Protected Data */}
+                                <div className="card-content">{}
                                     <button className="protected-data-btn" onClick={fetchProtectedData}>
                                         <svg className="lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -103,12 +101,12 @@ function App() {
                                         Access Protected Data
                                     </button>
 
-                                    {/* Кнопка авторизации через Telegram (только для неавторизованных пользователей) */}
+                                    {/* Кнопка авторизации через Telegram (из первого кода) */}
                                     {!isAuthenticated && (
                                         <TelegramLoginButton botName={config.botName} onAuth={handleTelegramAuth} />
                                     )}
 
-                                    {/* Кнопка перехода в Личный кабинет (только для авторизованных пользователей) */}
+                                    {/* Кнопка перехода в Личный кабинет */}
                                     {isAuthenticated && (
                                         <Link to="/dashboard" className="dashboard-btn">
                                             <svg className="lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -123,14 +121,13 @@ function App() {
                     }
                 />
 
-                {/* Страница "Личный кабинет" */}
                 <Route
                     path="/dashboard"
                     element={
                         isAuthenticated ? (
                             <Dashboard onLogout={handleLogout} />
                         ) : (
-                            <Navigate to="/" /> // Перенаправление, если пользователь не авторизован
+                            <Navigate to="/" />
                         )
                     }
                 />

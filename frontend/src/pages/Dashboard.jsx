@@ -16,7 +16,7 @@ const Dashboard = ({ onLogout }) => {
             </div>
 
             <button className="logout-btn" onClick={onLogout}>
-                Выйти
+                Logout
             </button>
         </div>
     );
