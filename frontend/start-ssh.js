@@ -1,24 +1,28 @@
-import { spawn } from 'child_process';
+import React, { useEffect } from 'react';
 
-const sshCommand = 'ssh';
-const sshArgs = ['-R', '80:localhost:5173', 'nokey@localhost.run'];
+const TelegramLoginButton = ({ botName, onAuth }) => {
+    useEffect(() => {
+        const script = document.createElement('script');
+        script.src = "https://telegram.org/js/telegram-widget.js?22";
+        script.async = true;
+        script.setAttribute('data-telegram-login', botName);
+        script.setAttribute('data-size', 'large');
+        script.setAttribute('data-onauth', 'onTelegramAuth(user)');
+        script.setAttribute('data-request-access', 'write');
+        document.body.appendChild(script);
 
-console.log('Запуск команды SSH...');
+        // Обработчик для получения данных от Telegram
+        window.onTelegramAuth = (user) => {
+            onAuth(user); // Передаем данные в родительский компонент
+        };
 
-const sshProcess = spawn(sshCommand, sshArgs);
+        return () => {
+            document.body.removeChild(script);
+            delete window.onTelegramAuth; // Удаляем обработчик при размонтировании компонента
+        };
+    }, [botName, onAuth]);
 
-sshProcess.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`);
-});
+    return <div id="telegram-login"></div>;
+};
 
-sshProcess.stderr.on('data', (data) => {
-    console.error(`stderr: ${data}`);
-});
-
-sshProcess.on('error', (error) => {
-    console.error(`Ошибка: ${error.message}`);
-});
-
-sshProcess.on('close', (code) => {
-    console.log(`Процесс завершён с кодом: ${code}`);
-});
+export default TelegramLoginButton;
