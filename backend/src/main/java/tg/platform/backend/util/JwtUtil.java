@@ -19,12 +19,15 @@ public class JwtUtil {
 
     // Генерация токена
     public String generateToken(String username) {
-        return Jwts.builder()
+        String token = Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
+
+        System.out.println("Generated token for " + username + ": " + token); // Логируем токен
+        return token;
     }
 
     // Проверка токена
