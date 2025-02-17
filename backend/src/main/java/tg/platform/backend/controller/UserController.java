@@ -19,7 +19,6 @@ public class UserController {
 
 
     private final JwtUtil jwtUtil;
-    private final String botToken = "7922894437:AAHpw1gT9uD5Cp3kVxswJcplAfIfgFsnSRk"; // Замените на токен вашего бота
 
     @PostMapping("/auth")
     public AuthResponse auth(@RequestBody Map<String, String> authData) {

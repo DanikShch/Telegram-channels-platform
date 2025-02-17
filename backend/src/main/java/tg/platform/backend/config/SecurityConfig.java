@@ -4,7 +4,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 import tg.platform.backend.util.JwtTokenFilter;
 import tg.platform.backend.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -71,39 +69,3 @@ public class SecurityConfig {
 
 
 }
-
-/* import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.web.SecurityFilterChain;
-
-@Configuration
-@EnableWebSecurity
-public class SecurityConfig {
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/users/auth").permitAll()
-                        .anyRequest().authenticated()
-                );
-
-        return http.build();
-    }
-}*/
-
-  /*  @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.setAllowedOrigins(Arrays.asList("https://painfully-mint-thrasher.cloudpub.ru")); // Замените на ваш домен
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Разрешенные методы
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type")); // Разрешенные заголовки
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
-    }*/
