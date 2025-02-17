@@ -1,5 +1,6 @@
 .dashboard-container {
     min-height: 100vh;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -7,10 +8,36 @@
     background: linear-gradient(to bottom, #0f172a, #1e293b);
     color: #e2e8f0;
     padding: 2rem;
+    position: relative;
 }
 
+.logout-btn {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    padding: 0.5rem 1rem;
+    background: #475569;
+    color: #f8fafc;
+    border: none;
+    border-radius: 0.5rem;
+    /*font-family: 'Roboto', sans-serif;*/
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+    width: auto;  /* Фикс: не растягиваем кнопку */
+    height: auto; /* Фикс: не даем унаследовать высоту */
+    display: inline-block;
+}
+
+.logout-btn:hover {
+    background: #64748b;
+    transform: scale(1.05);
+}
+
+/* Заголовки и контент */
 .dashboard-title {
-    font-size: 2.5rem;
+    font-size: 3rem;
     font-weight: 700;
     margin-bottom: 1rem;
     color: #f8fafc;
@@ -19,11 +46,11 @@
 
 .dashboard-subtitle {
     color: #94a3b8;
-    font-size: 1.25rem;
-    line-height: 1.5;
+    font-size: 1.5rem;
     margin-bottom: 2rem;
 }
 
+/* Анимированный текст */
 .animated-text {
     display: flex;
     gap: 1rem;
@@ -38,21 +65,4 @@
     50% {
         transform: translateY(-10px);
     }
-}
-
-.logout-btn {
-    margin-top: 2rem;
-    padding: 0.75rem 1.5rem;
-    background: #475569;
-    color: #f8fafc;
-    border: none;
-    border-radius: 0.5rem;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s ease;
-}
-
-.logout-btn:hover {
-    background: #64748b;
 }
