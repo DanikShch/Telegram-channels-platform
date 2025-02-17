@@ -1,6 +1,6 @@
 const config = {
-    baseUrl: 'https://fragrantly-allowing-sabertooth.cloudpub.ru',
-    botName: 'tgauth4bot'
+    baseUrl: 'https://amorously-sublime-jerboa.cloudpub.ru',
+    botName: 'AdGramX_bot'
 };
 
 export default config;

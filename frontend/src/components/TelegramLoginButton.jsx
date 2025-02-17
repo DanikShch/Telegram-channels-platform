@@ -11,14 +11,13 @@ const TelegramLoginButton = ({ botName, onAuth }) => {
         script.setAttribute('data-request-access', 'write');
         document.body.appendChild(script);
 
-        // Обработчик для получения данных от Telegram
         window.onTelegramAuth = (user) => {
-            onAuth(user); // Передаем данные в родительский компонент
+            onAuth(user);
         };
 
         return () => {
             document.body.removeChild(script);
-            delete window.onTelegramAuth; // Удаляем обработчик при размонтировании компонента
+            delete window.onTelegramAuth;
         };
     }, [botName, onAuth]);
 
