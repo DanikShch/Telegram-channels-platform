@@ -1,4 +1,4 @@
-# Telegram-channels-platform
+# AdGram — Telegram channels platform
 
 ## Технологии
 
