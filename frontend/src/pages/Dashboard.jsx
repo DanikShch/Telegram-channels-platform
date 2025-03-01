@@ -1,28 +1,47 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Edit } from "lucide-react";
 import "./Dashboard.css";
+import config from "../config/config.js";
 
 const Dashboard = ({ onLogout }) => {
-    // Mock data for channels - in a real app, this would come from a database
-    const [channels, setChannels] = useState([
-        {
-            id: 1,
-            name: "Название канала 1",
-            avatar: "https://i.imgur.com/eFV3Ep7.jpeg",
-            subscribers: "12.5K",
-            views: "1.2K",
-            description: "Описание канала и дополнительная информация о контенте"
-        },
-        {
-            id: 2,
-            name: "Название канала 2",
-            avatar: "https://i.imgur.com/eFV3Ep7.jpeg",
-            subscribers: "8.3K",
-            views: "950",
-            description: "Еще один интересный канал с полезным контентом"
-        }
-    ]);
+    const [channels, setChannels] = useState([]);
+
+    // Загрузка каналов пользователя
+    useEffect(() => {
+        const fetchChannels = async () => {
+            try {
+                const token = localStorage.getItem("jwtToken");
+                if (!token) {
+                    alert("Вы не авторизованы!");
+                    return;
+                }
+
+                // Замените `userId` на реальный ID пользователя
+                const userId = 1; // Это временное значение, замените на реальное
+                const response = await fetch(`${config.baseUrl}/api/channels/${userId}`, {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setChannels(data);
+                } else {
+                    const errorData = await response.json();
+                    console.error("Ошибка при загрузке каналов:", errorData);
+                    alert(`Ошибка: ${errorData.message || "Неизвестная ошибка"}`);
+                }
+            } catch (error) {
+                console.error("Ошибка при отправке запроса:", error);
+                alert("Произошла ошибка при загрузке каналов.");
+            }
+        };
+
+        fetchChannels();
+    }, []);
 
     return (
         <div className="dashboard-container">
@@ -36,17 +55,16 @@ const Dashboard = ({ onLogout }) => {
                 <span>👾</span>
                 <span>🧶</span>
             </div>
-
             <div className="channels-container">
                 <h2 className="channels-title">Ваши каналы</h2>
                 <div className="channels-list">
-                    {channels.map(channel => (
+                    {channels.map((channel) => (
                         <div key={channel.id} className="channel-item">
                             <div className="channel-item-avatar">
-                                <img src={channel.avatar} alt={channel.name} />
+                                <img src={channel.photoUrl || "https://i.imgur.com/eFV3Ep7.jpeg"} alt={channel.channelName} />
                             </div>
                             <div className="channel-item-info">
-                                <h3 className="channel-item-name">{channel.name}</h3>
+                                <h3 className="channel-item-name">{channel.channelName}</h3>
                                 <p className="channel-item-description">{channel.description}</p>
                                 <div className="channel-item-stats">
                                     <span className="stat">
@@ -65,11 +83,9 @@ const Dashboard = ({ onLogout }) => {
                     ))}
                 </div>
             </div>
-
             <Link to="/add-channel" className="add-channel-btn">
                 Add channel
             </Link>
-
             <button className="logout-btn" onClick={onLogout}>
                 Logout
             </button>

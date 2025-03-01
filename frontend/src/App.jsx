@@ -4,6 +4,7 @@ import TelegramLoginButton from "./components/TelegramLoginButton";
 import config from "./config/config.js";
 import Dashboard from "./pages/Dashboard";
 import AddChannel from "./pages/AddChannel";
+import EditChannel from "./pages/EditChannel";
 import "./App.css";
 
 function App() {
@@ -93,7 +94,7 @@ function App() {
                                     <p className="subtitle">Login using your Telegram account</p>
                                 </div>
 
-                                <div className="card-content">{}
+                                <div className="card-content">
                                     <button className="protected-data-btn" onClick={fetchProtectedData}>
                                         <svg className="lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -136,6 +137,17 @@ function App() {
                     element={
                         isAuthenticated ? (
                             <AddChannel />
+                        ) : (
+                            <Navigate to="/" />
+                        )
+                    }
+                />
+
+                <Route
+                    path="/edit-channel/:channelId"
+                    element={
+                        isAuthenticated ? (
+                            <EditChannel />
                         ) : (
                             <Navigate to="/" />
                         )

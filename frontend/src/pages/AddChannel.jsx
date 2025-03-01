@@ -1,56 +1,54 @@
 import React, { useState, useEffect } from "react";
 import { Check, Plus, X, ChevronDown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import "./AddChannel.css";
+import config from "../config/config.js";
 
 const AddChannel = () => {
-    const [channelLink, setChannelLink] = useState("");
+    const [channelData, setChannelData] = useState({
+        channelName: "",
+        channelUrl: "",
+        description: "",
+        subscribers: "",
+        views: "",
+        formatPrices: {
+            "1/24": "",
+            "2/48": "",
+            "3/72": "",
+            "Нативный": "",
+            "7 дней": "",
+            "Репост": "",
+        },
+        discountsEnabled: false,
+        selectedDiscount: "5%",
+        geoEnabled: false,
+        selectedRegion: "",
+        isAuthorChannel: false,
+        socialLinks: [""],
+        subscriberSource: "",
+    });
+
     const [isVerified, setIsVerified] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [showPopup, setShowPopup] = useState(false);
-
-    // Format options
-    const [formatPrices, setFormatPrices] = useState({
-        "1/24": "",
-        "2/48": "",
-        "3/72": "",
-        "Нативный": "",
-        "7 дней": "",
-        "Репост": ""
-    });
-
-    // Discounts
-    const [discountsEnabled, setDiscountsEnabled] = useState(false);
-    const [selectedDiscount, setSelectedDiscount] = useState("5%");
     const [discountDropdownOpen, setDiscountDropdownOpen] = useState(false);
-
-    // Geo options
-    const [geoEnabled, setGeoEnabled] = useState(false);
-    const [selectedRegion, setSelectedRegion] = useState("Москва");
     const [geoDropdownOpen, setGeoDropdownOpen] = useState(false);
-
-    // Author channel
-    const [isAuthorChannel, setIsAuthorChannel] = useState(false);
-    const [socialLinks, setSocialLinks] = useState([""]);
-
-    // Source
-    const [subscriberSource, setSubscriberSource] = useState("");
-
-    // Animation
     const [fadeIn, setFadeIn] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         setFadeIn(true);
     }, []);
 
-    const handleFormatPriceChange = (format, price) => {
-        setFormatPrices(prev => ({
+    const updateChannelData = (field, value) => {
+        setChannelData((prev) => ({
             ...prev,
-            [format]: price
+            [field]: value,
         }));
     };
 
     const handleVerifyChannel = () => {
-        if (!channelLink) return;
+        if (!channelData.channelUrl) return;
 
         setIsLoading(true);
 
@@ -61,28 +59,60 @@ const AddChannel = () => {
         }, 1000);
     };
 
+    const handleFormatPriceChange = (format, price) => {
+        const updatedFormatPrices = { ...channelData.formatPrices, [format]: price };
+        updateChannelData("formatPrices", updatedFormatPrices);
+    };
+
     const handleAddSocialLink = () => {
-        setSocialLinks([...socialLinks, ""]);
+        updateChannelData("socialLinks", [...channelData.socialLinks, ""]);
     };
 
     const handleSocialLinkChange = (index, value) => {
-        const newLinks = [...socialLinks];
+        const newLinks = [...channelData.socialLinks];
         newLinks[index] = value;
-        setSocialLinks(newLinks);
+        updateChannelData("socialLinks", newLinks);
     };
 
     const handleRemoveSocialLink = (index) => {
-        if (socialLinks.length > 1) {
-            const newLinks = [...socialLinks];
+        if (channelData.socialLinks.length > 1) {
+            const newLinks = [...channelData.socialLinks];
             newLinks.splice(index, 1);
-            setSocialLinks(newLinks);
+            updateChannelData("socialLinks", newLinks);
         }
     };
 
-    const handleSaveChannel = () => {
-        // Here you would implement the logic to save the channel
-        // For now, we'll just redirect to the dashboard
-        window.location.href = "/dashboard";
+    const handleSaveChannel = async () => {
+        try {
+            const token = localStorage.getItem("jwtToken");
+            if (!token) {
+                alert("Вы не авторизованы!");
+                return;
+            }
+
+            const userId = 1; // Замените на реальный ID пользователя
+            const response = await fetch(`${config.baseUrl}/api/channels/${userId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(channelData),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log("Канал успешно сохранен:", data);
+                navigate("/dashboard"); // Перенаправляем на дашборд
+            } else {
+                const errorData = await response.json();
+                console.error("Ошибка при сохранении канала:", errorData);
+                alert(`Ошибка: ${errorData.message || "Неизвестная ошибка"}`);
+            }
+        } catch (error) {
+            console.error("Ошибка при отправке запроса:", error);
+            alert("Произошла ошибка при сохранении канала.");
+        }
     };
 
     const formatOptions = ["1/24", "2/48", "3/72", "Нативный", "7 дней", "Репост"];
@@ -101,13 +131,13 @@ const AddChannel = () => {
                                 type="text"
                                 className="channel-input"
                                 placeholder="Введите ссылку на канал"
-                                value={channelLink}
-                                onChange={(e) => setChannelLink(e.target.value)}
+                                value={channelData.channelUrl}
+                                onChange={(e) => updateChannelData("channelUrl", e.target.value)}
                             />
                             <button
                                 className={`verify-button ${isLoading ? "loading" : ""}`}
                                 onClick={handleVerifyChannel}
-                                disabled={isLoading || !channelLink}
+                                disabled={isLoading || !channelData.channelUrl}
                             >
                                 {isLoading ? (
                                     <span className="loading-spinner"></span>
@@ -128,21 +158,21 @@ const AddChannel = () => {
                                 <img src="https://i.imgur.com/eFV3Ep7.jpeg" alt="Channel Avatar" />
                             </div>
                             <div className="channel-info">
-                                <h2 className="channel-name">Название канала</h2>
-                                <p className="channel-description">Описание канала и дополнительная информация о контенте</p>
+                                <h2 className="channel-name">{channelData.channelName}</h2>
+                                <p className="channel-description">{channelData.description}</p>
                                 <div className="channel-stats">
                                     <span className="stat">
-                                        <strong>12.5K</strong> подписчиков
+                                        <strong>{channelData.subscribers}</strong> подписчиков
                                     </span>
                                     <span className="stat">
-                                        <strong>1.2K</strong> просмотров
+                                        <strong>{channelData.views}</strong> просмотров
                                     </span>
                                 </div>
                             </div>
                         </div>
 
                         <div className="form-sections">
-                            {/* Format Section */}
+                            {/* Формат и цена размещения */}
                             <section className="form-section">
                                 <div className="section-header">
                                     <h2>Формат и цена размещения</h2>
@@ -159,9 +189,9 @@ const AddChannel = () => {
                                             <label className="custom-checkbox">
                                                 <input
                                                     type="checkbox"
-                                                    checked={formatPrices[format] !== ""}
+                                                    checked={channelData.formatPrices[format] !== ""}
                                                     onChange={() => {
-                                                        if (formatPrices[format] !== "") {
+                                                        if (channelData.formatPrices[format] !== "") {
                                                             handleFormatPriceChange(format, "");
                                                         } else {
                                                             handleFormatPriceChange(format, "0");
@@ -175,7 +205,7 @@ const AddChannel = () => {
                                                 type="text"
                                                 className="price-input"
                                                 placeholder="Цена"
-                                                value={formatPrices[format]}
+                                                value={channelData.formatPrices[format]}
                                                 onChange={(e) => handleFormatPriceChange(format, e.target.value)}
                                             />
                                         </div>
@@ -183,27 +213,27 @@ const AddChannel = () => {
                                 </div>
                             </section>
 
-                            {/* Discounts Section */}
+                            {/* Скидки */}
                             <section className="form-section">
                                 <div className="section-header">
                                     <label className="header-checkbox">
                                         <input
                                             type="checkbox"
-                                            checked={discountsEnabled}
-                                            onChange={() => setDiscountsEnabled(!discountsEnabled)}
+                                            checked={channelData.discountsEnabled}
+                                            onChange={() => updateChannelData("discountsEnabled", !channelData.discountsEnabled)}
                                         />
                                         <span className="checkbox-mark"></span>
                                     </label>
                                     <h2>Скидки</h2>
                                 </div>
 
-                                {discountsEnabled && (
+                                {channelData.discountsEnabled && (
                                     <div className="custom-dropdown">
                                         <div
                                             className="dropdown-header"
                                             onClick={() => setDiscountDropdownOpen(!discountDropdownOpen)}
                                         >
-                                            <span>{selectedDiscount}</span>
+                                            <span>{channelData.selectedDiscount}</span>
                                             <ChevronDown size={18} className={discountDropdownOpen ? "rotate" : ""} />
                                         </div>
                                         {discountDropdownOpen && (
@@ -211,9 +241,9 @@ const AddChannel = () => {
                                                 {discountOptions.map((option) => (
                                                     <div
                                                         key={option}
-                                                        className={`dropdown-option ${selectedDiscount === option ? "selected" : ""}`}
+                                                        className={`dropdown-option ${channelData.selectedDiscount === option ? "selected" : ""}`}
                                                         onClick={() => {
-                                                            setSelectedDiscount(option);
+                                                            updateChannelData("selectedDiscount", option);
                                                             setDiscountDropdownOpen(false);
                                                         }}
                                                     >
@@ -226,27 +256,27 @@ const AddChannel = () => {
                                 )}
                             </section>
 
-                            {/* Geo Section */}
+                            {/* Гео канала */}
                             <section className="form-section">
                                 <div className="section-header">
                                     <label className="header-checkbox">
                                         <input
                                             type="checkbox"
-                                            checked={geoEnabled}
-                                            onChange={() => setGeoEnabled(!geoEnabled)}
+                                            checked={channelData.geoEnabled}
+                                            onChange={() => updateChannelData("geoEnabled", !channelData.geoEnabled)}
                                         />
                                         <span className="checkbox-mark"></span>
                                     </label>
                                     <h2>Гео канала</h2>
                                 </div>
 
-                                {geoEnabled && (
+                                {channelData.geoEnabled && (
                                     <div className="custom-dropdown">
                                         <div
                                             className="dropdown-header"
                                             onClick={() => setGeoDropdownOpen(!geoDropdownOpen)}
                                         >
-                                            <span>{selectedRegion}</span>
+                                            <span>{channelData.selectedRegion}</span>
                                             <ChevronDown size={18} className={geoDropdownOpen ? "rotate" : ""} />
                                         </div>
                                         {geoDropdownOpen && (
@@ -254,9 +284,9 @@ const AddChannel = () => {
                                                 {regionOptions.map((option) => (
                                                     <div
                                                         key={option}
-                                                        className={`dropdown-option ${selectedRegion === option ? "selected" : ""}`}
+                                                        className={`dropdown-option ${channelData.selectedRegion === option ? "selected" : ""}`}
                                                         onClick={() => {
-                                                            setSelectedRegion(option);
+                                                            updateChannelData("selectedRegion", option);
                                                             setGeoDropdownOpen(false);
                                                         }}
                                                     >
@@ -269,7 +299,7 @@ const AddChannel = () => {
                                 )}
                             </section>
 
-                            {/* Subscriber Source Section */}
+                            {/* Источник подписчиков */}
                             <section className="form-section">
                                 <h2 className="source-title">Источник подписчиков</h2>
                                 <div className="input-group source-input-group">
@@ -277,29 +307,29 @@ const AddChannel = () => {
                                         type="text"
                                         className="text-input"
                                         placeholder="Введите источник"
-                                        value={subscriberSource}
-                                        onChange={(e) => setSubscriberSource(e.target.value)}
+                                        value={channelData.subscriberSource}
+                                        onChange={(e) => updateChannelData("subscriberSource", e.target.value)}
                                     />
                                 </div>
                             </section>
 
-                            {/* Author Channel Section */}
+                            {/* Авторский канал */}
                             <section className="form-section">
                                 <div className="section-header">
                                     <label className="header-checkbox">
                                         <input
                                             type="checkbox"
-                                            checked={isAuthorChannel}
-                                            onChange={() => setIsAuthorChannel(!isAuthorChannel)}
+                                            checked={channelData.isAuthorChannel}
+                                            onChange={() => updateChannelData("isAuthorChannel", !channelData.isAuthorChannel)}
                                         />
                                         <span className="checkbox-mark"></span>
                                     </label>
                                     <h2>Авторский канал</h2>
                                 </div>
 
-                                {isAuthorChannel && (
+                                {channelData.isAuthorChannel && (
                                     <div className="social-links">
-                                        {socialLinks.map((link, index) => (
+                                        {channelData.socialLinks.map((link, index) => (
                                             <div key={index} className="social-link-input">
                                                 <input
                                                     type="text"
@@ -311,7 +341,7 @@ const AddChannel = () => {
                                                 <button
                                                     className="remove-link-button"
                                                     onClick={() => handleRemoveSocialLink(index)}
-                                                    disabled={socialLinks.length === 1}
+                                                    disabled={channelData.socialLinks.length === 1}
                                                 >
                                                     <X size={18} />
                                                 </button>
@@ -335,7 +365,7 @@ const AddChannel = () => {
                 )}
             </div>
 
-            {/* Format Info Popup */}
+            {/* Форматы размещения (попап) */}
             {showPopup && (
                 <div className="popup-overlay" onClick={() => setShowPopup(false)}>
                     <div className="popup-content" onClick={(e) => e.stopPropagation()}>
