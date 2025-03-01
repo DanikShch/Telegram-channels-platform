@@ -60,3 +60,5 @@ out/
 public/static/
 frontend/src/config/config.js
 backend/src/main/resources/application.properties
+backend/src/main/resources/application.properties
+frontend/src/config/config.js

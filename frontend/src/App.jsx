@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, Link, Navigate } from "react-ro
 import TelegramLoginButton from "./components/TelegramLoginButton";
 import config from "./config/config.js";
 import Dashboard from "./pages/Dashboard";
+import AddChannel from "./pages/AddChannel";
 import "./App.css";
 
 function App() {
@@ -101,12 +102,10 @@ function App() {
                                         Access Protected Data
                                     </button>
 
-                                    {/* Кнопка авторизации через Telegram (из первого кода) */}
                                     {!isAuthenticated && (
                                         <TelegramLoginButton botName={config.botName} onAuth={handleTelegramAuth} />
                                     )}
 
-                                    {/* Кнопка перехода в Личный кабинет */}
                                     {isAuthenticated && (
                                         <Link to="/dashboard" className="dashboard-btn">
                                             <svg className="lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -126,6 +125,17 @@ function App() {
                     element={
                         isAuthenticated ? (
                             <Dashboard onLogout={handleLogout} />
+                        ) : (
+                            <Navigate to="/" />
+                        )
+                    }
+                />
+
+                <Route
+                    path="/add-channel"
+                    element={
+                        isAuthenticated ? (
+                            <AddChannel />
                         ) : (
                             <Navigate to="/" />
                         )

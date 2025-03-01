@@ -19,6 +19,6 @@ public class ProtectedController {
         String jwtToken = token.substring(7); // Убираем "Bearer "
         String username = jwtUtil.getUsername(jwtToken);
 
-        return "Hello, " + username + "! This is protected data.";
+        return "Hello, " + username + "! Secure data is displayed on the server.";
     }
 }
