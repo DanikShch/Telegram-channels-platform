@@ -24,6 +24,11 @@ public class ChannelController {
         return channelService.getChannelsByUserId(userId);
     }
 
+    @GetMapping("/channel/{channelId}")
+    public ChannelDTO getChannelById(@PathVariable Long channelId) {
+        return channelService.getChannelById(channelId);
+    }
+
     @DeleteMapping("/{channelId}")
     public void deleteChannel(@PathVariable Long channelId) {
         channelService.deleteChannel(channelId);

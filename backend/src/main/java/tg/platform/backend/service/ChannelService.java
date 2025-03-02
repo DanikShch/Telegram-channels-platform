@@ -30,7 +30,7 @@ public class ChannelService {
         Channel channel = new Channel();
         channel.setUser(user);
         channel.setChannelName(channelDTO.getChannelName());
-        channel.setChannelId(channelDTO.getChannelId());
+        channel.setChannelId(channelDTO.getChannelId()); // это идентификатор из Telegram
         channel.setChannelUrl(channelDTO.getChannelUrl());
         channel.setDescription(channelDTO.getDescription());
         channel.setSubscribers(channelDTO.getSubscribers());
@@ -46,6 +46,13 @@ public class ChannelService {
 
         Channel savedChannel = channelRepository.save(channel);
         return mapToDTO(savedChannel);
+    }
+
+    public ChannelDTO getChannelById(Long channelId) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new RuntimeException("Channel not found"));
+        System.out.println("Channel data: " + channel); // Логирование данных
+        return mapToDTO(channel);
     }
 
     public List<ChannelDTO> getChannelsByUserId(Long userId) {
@@ -89,8 +96,8 @@ public class ChannelService {
 
     private ChannelDTO mapToDTO(Channel channel) {
         return new ChannelDTO(
-                channel.getId(),
-                channel.getChannelId(),
+                channel.getId(), // Первичный ключ из базы данных
+                channel.getChannelId(), // Идентификатор из Telegram
                 channel.getChannelName(),
                 channel.getChannelUrl(),
                 channel.getDescription(),

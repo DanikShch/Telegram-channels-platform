@@ -52,7 +52,7 @@ const EditChannel = () => {
                     return;
                 }
 
-                const response = await fetch(`${config.baseUrl}/api/channels/${channelId}`, {
+                const response = await fetch(`${config.baseUrl}/api/channels/channel/${channelId}`, {
                     method: "GET",
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -61,10 +61,12 @@ const EditChannel = () => {
 
                 if (response.ok) {
                     const data = await response.json();
+                    console.log("Channel data loaded:", data); // Логирование данных
+                    console.log("Channel ID from API:", data.channelId); // Логирование channelId
                     setChannelData({
                         channelName: data.channelName || "",
                         channelUrl: data.channelUrl || "",
-                        channelId: data.channelId || "",
+                        channelId: data.channelId || "", // Убедитесь, что это идентификатор из Telegram
                         description: data.description || "",
                         subscribers: data.subscribers || "",
                         views: data.views || "",
@@ -171,7 +173,7 @@ const EditChannel = () => {
 
                 <div className="channel-card">
                     <div className="channel-avatar">
-                        <img src={"channel_avatars/"+channelData.channelId+".jpg"} alt="Channel Avatar" />
+                        <img src={"channel_avatars/" + channelData.channelId + ".jpg"} alt="Channel Avatar"/>
                     </div>
                     <div className="channel-info">
                         <h2 className="channel-name">{channelData.channelName}</h2>

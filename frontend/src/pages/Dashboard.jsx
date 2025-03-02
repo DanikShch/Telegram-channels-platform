@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Edit } from "lucide-react";
+import { Edit, Trash } from "lucide-react"; // Импортируем иконку Trash
 import "./Dashboard.css";
 import config from "../config/config.js";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 const Dashboard = ({ onLogout }) => {
     const [channels, setChannels] = useState([]);
@@ -44,6 +44,37 @@ const Dashboard = ({ onLogout }) => {
         fetchChannels();
     }, []);
 
+    // Функция для удаления канала
+    const handleDeleteChannel = async (channelId) => {
+        try {
+            const token = localStorage.getItem("jwtToken");
+            if (!token) {
+                alert("Вы не авторизованы!");
+                return;
+            }
+
+            const response = await fetch(`${config.baseUrl}/api/channels/${channelId}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.ok) {
+                // Удаляем канал из состояния
+                setChannels(channels.filter(channel => channel.id !== channelId));
+                alert("Канал успешно удален!");
+            } else {
+                const errorData = await response.json();
+                console.error("Ошибка при удалении канала:", errorData);
+                alert(`Ошибка: ${errorData.message || "Неизвестная ошибка"}`);
+            }
+        } catch (error) {
+            console.error("Ошибка при отправке запроса:", error);
+            alert("Произошла ошибка при удалении канала.");
+        }
+    };
+
     return (
         <div className="dashboard-container">
             <h1 className="dashboard-title">Dashboard</h1>
@@ -62,7 +93,7 @@ const Dashboard = ({ onLogout }) => {
                     {channels.map((channel) => (
                         <div key={channel.id} className="channel-item">
                             <div className="channel-item-avatar">
-                                <img src={"channel_avatars/"+channel.channelId+".jpg"} alt={channel.channelName} />
+                                <img src={"channel_avatars/" + channel.channelId + ".jpg"} alt={channel.channelName} />
                             </div>
                             <div className="channel-item-info">
                                 <h3 className="channel-item-name">{channel.channelName}</h3>
@@ -76,10 +107,19 @@ const Dashboard = ({ onLogout }) => {
                                     </span>
                                 </div>
                             </div>
-                            <Link to={`/edit-channel/${channel.id}`} className="edit-channel-btn">
-                                <Edit size={18} />
-                                <span>Редактировать</span>
-                            </Link>
+                            <div className="channel-item-actions">
+                                <Link to={`/edit-channel/${channel.id}`} className="edit-channel-btn">
+                                    <Edit size={18} />
+                                    <span>Редактировать</span>
+                                </Link>
+                                <button
+                                    className="delete-channel-btn"
+                                    onClick={() => handleDeleteChannel(channel.id)}
+                                >
+                                    <Trash size={18} />
+                                    <span>Удалить</span>
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>
