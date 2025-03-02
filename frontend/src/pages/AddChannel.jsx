@@ -69,29 +69,28 @@ const AddChannel = () => {
                 },
             });
 
-            if (response.ok) {
-                const data = await response.json(); // Получаем channelDTO
-                console.log("Данные канала:", data);
-
-                // Обновляем состояние channelData
-                setChannelData((prev) => ({
-                    ...prev,
-                    channelName: data.channelName,
-                    channelId: data.channelId,
-                    channelUrl: data.channelUrl,
-                    description: data.description,
-                    subscribers: data.subscribers,
-                }));
-
-                setIsVerified(true); // Устанавливаем флаг проверки
-            } else {
-                const errorData = await response.json();
-                console.error("Ошибка при проверке канала:", errorData);
-                alert(`Ошибка: ${errorData.message || "Не удалось проверить канал"}`);
+            if (!response.ok) {
+                const errorData = await response.json(); // Парсим JSON с ошибкой
+                throw new Error(errorData.message || "Не удалось проверить канал"); // Бросаем ошибку с текстом из сервера
             }
+
+            const data = await response.json(); // Получаем channelDTO
+            console.log("Данные канала:", data);
+
+            // Обновляем состояние channelData
+            setChannelData((prev) => ({
+                ...prev,
+                channelName: data.channelName,
+                channelId: data.channelId,
+                channelUrl: data.channelUrl,
+                description: data.description,
+                subscribers: data.subscribers,
+            }));
+
+            setIsVerified(true); // Устанавливаем флаг проверки
         } catch (error) {
             console.error("Ошибка при отправке запроса:", error);
-            alert("Произошла ошибка при проверке канала.");
+            alert(error.message); // Выводим сообщение об ошибке
         } finally {
             setIsLoading(false); // Сбрасываем состояние загрузки
         }

@@ -108,6 +108,9 @@ public class ChannelService {
     }
 
     public ChannelDTO getChannelInfoByName(String channelUrl) {
+        if(channelRepository.existsByChannelUrl(channelUrl)) {
+            throw new RuntimeException("Channel already exists");
+        }
         ChannelDTO channelDTO = new ChannelDTO();
         try {
             Process process = new ProcessBuilder("python", "telethon_script.py", channelUrl).start();

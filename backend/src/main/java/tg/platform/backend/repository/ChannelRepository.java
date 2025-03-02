@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface ChannelRepository extends JpaRepository<Channel, Long> {
     List<Channel> findByUserId(Long userId);
-    //Channel findByChannelId(Long channelId);
+
+    Boolean existsByChannelUrl(String channelUrl);
 }
