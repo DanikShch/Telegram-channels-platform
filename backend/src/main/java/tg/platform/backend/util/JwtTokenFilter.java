@@ -44,10 +44,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             token = token.substring("Bearer ".length());
             System.out.println("Extracted token: " + token);
 
-            if (jwtUtil.getUsername(token) != null && !jwtUtil.isTokenExpired(token)) {
-                System.out.println("Token is valid for user: " + jwtUtil.getUsername(token));
+            if (jwtUtil.getUserId(token) != null && !jwtUtil.isTokenExpired(token)) {
+                System.out.println("Token is valid for user: " + jwtUtil.getUserId(token));
                 SecurityContextHolder.getContext().setAuthentication(
-                        new JwtAuthenticationToken(jwtUtil.getUsername(token))
+                        new JwtAuthenticationToken(jwtUtil.getUserId(token))
                 );
             } else {
                 System.out.println("Token is invalid or expired");

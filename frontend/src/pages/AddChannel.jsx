@@ -3,10 +3,12 @@ import { Check, Plus, X, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "./AddChannel.css";
 import config from "../config/config.js";
+import { jwtDecode } from "jwt-decode";
 
 const AddChannel = () => {
     const [channelData, setChannelData] = useState({
         channelName: "",
+        channelId: "",
         channelUrl: "",
         description: "",
         subscribers: "",
@@ -47,16 +49,52 @@ const AddChannel = () => {
         }));
     };
 
-    const handleVerifyChannel = () => {
+    const handleVerifyChannel = async () => {
         if (!channelData.channelUrl) return;
 
         setIsLoading(true);
 
-        // Simulate API call
-        setTimeout(() => {
-            setIsVerified(true);
-            setIsLoading(false);
-        }, 1000);
+        try {
+            const token = localStorage.getItem("jwtToken");
+            if (!token) {
+                alert("Вы не авторизованы!");
+                return;
+            }
+
+            // Отправляем запрос на /api/channels/info
+            const response = await fetch(`${config.baseUrl}/api/channels/info?channelUrl=${encodeURIComponent(channelData.channelUrl)}`, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json(); // Получаем channelDTO
+                console.log("Данные канала:", data);
+
+                // Обновляем состояние channelData
+                setChannelData((prev) => ({
+                    ...prev,
+                    channelName: data.channelName,
+                    channelId: data.channelId,
+                    channelUrl: data.channelUrl,
+                    description: data.description,
+                    subscribers: data.subscribers,
+                }));
+
+                setIsVerified(true); // Устанавливаем флаг проверки
+            } else {
+                const errorData = await response.json();
+                console.error("Ошибка при проверке канала:", errorData);
+                alert(`Ошибка: ${errorData.message || "Не удалось проверить канал"}`);
+            }
+        } catch (error) {
+            console.error("Ошибка при отправке запроса:", error);
+            alert("Произошла ошибка при проверке канала.");
+        } finally {
+            setIsLoading(false); // Сбрасываем состояние загрузки
+        }
     };
 
     const handleFormatPriceChange = (format, price) => {
@@ -90,7 +128,8 @@ const AddChannel = () => {
                 return;
             }
 
-            const userId = 1; // Замените на реальный ID пользователя
+            const decodedToken = jwtDecode(token);
+            const userId = decodedToken.sub;
             const response = await fetch(`${config.baseUrl}/api/channels/${userId}`, {
                 method: "POST",
                 headers: {
@@ -119,6 +158,7 @@ const AddChannel = () => {
     const discountOptions = ["5%", "10%", "15%", "20%", "25%", "30%", "35%", "40%", "45%", "50%", "55%", "60%"];
     const regionOptions = ["Москва", "Санкт-Петербург", "Минск", "Гродно", "Киев", "Алматы"];
 
+    const avatar_path = `channel_avatars/${channelData.channelId}.jpg`;
     return (
         <div className={`add-channel-container ${fadeIn ? "fade-in" : ""}`}>
             <div className="add-channel-content">
@@ -155,7 +195,7 @@ const AddChannel = () => {
                     <>
                         <div className="channel-card">
                             <div className="channel-avatar">
-                                <img src="https://i.imgur.com/eFV3Ep7.jpeg" alt="Channel Avatar" />
+                                <img src={avatar_path} alt="Channel Avatar" />
                             </div>
                             <div className="channel-info">
                                 <h2 className="channel-name">{channelData.channelName}</h2>

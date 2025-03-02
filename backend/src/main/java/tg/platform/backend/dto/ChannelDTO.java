@@ -11,10 +11,11 @@ import java.util.Map;
 @NoArgsConstructor
 public class ChannelDTO {
     private Long id;
+    private Long channelId;
     private String channelName;
     private String channelUrl;
     private String description;
-    private String subscribers;
+    private Long subscribers;
     private String views;
     private Map<String, String> formatPrices;
     private Boolean discountsEnabled;

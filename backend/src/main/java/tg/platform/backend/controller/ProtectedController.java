@@ -17,8 +17,8 @@ public class ProtectedController {
         System.out.println("Received token: " + token); // Отладочное сообщение
 
         String jwtToken = token.substring(7); // Убираем "Bearer "
-        String username = jwtUtil.getUsername(jwtToken);
+        Long userId = jwtUtil.getUserId(jwtToken);
 
-        return "Hello, " + username + "! Secure data is displayed on the server.";
+        return "Hello, id=" + userId + "! Secure data is displayed on the server.";
     }
 }

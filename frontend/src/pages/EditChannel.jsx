@@ -12,6 +12,7 @@ const EditChannel = () => {
         channelName: "",
         channelUrl: "",
         description: "",
+        channelId: "",
         subscribers: "",
         views: "",
         formatPrices: {
@@ -63,6 +64,7 @@ const EditChannel = () => {
                     setChannelData({
                         channelName: data.channelName || "",
                         channelUrl: data.channelUrl || "",
+                        channelId: data.channelId || "",
                         description: data.description || "",
                         subscribers: data.subscribers || "",
                         views: data.views || "",
@@ -169,7 +171,7 @@ const EditChannel = () => {
 
                 <div className="channel-card">
                     <div className="channel-avatar">
-                        <img src="https://i.imgur.com/eFV3Ep7.jpeg" alt="Channel Avatar" />
+                        <img src={"channel_avatars/"+channelData.channelId+".jpg"} alt="Channel Avatar" />
                     </div>
                     <div className="channel-info">
                         <h2 className="channel-name">{channelData.channelName}</h2>

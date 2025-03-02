@@ -31,11 +31,14 @@ public class Channel {
     @Column(name = "channel_url", nullable = false)
     private String channelUrl;
 
+    @Column(name = "channel_id")
+    private Long channelId;
+
     @Column(name = "description")
     private String description;
 
     @Column(name = "subscribers")
-    private String subscribers;
+    private Long subscribers;
 
     @Column(name = "views")
     private String views;

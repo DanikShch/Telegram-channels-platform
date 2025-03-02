@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Edit } from "lucide-react";
 import "./Dashboard.css";
 import config from "../config/config.js";
+import {jwtDecode} from "jwt-decode";
 
 const Dashboard = ({ onLogout }) => {
     const [channels, setChannels] = useState([]);
@@ -17,8 +18,8 @@ const Dashboard = ({ onLogout }) => {
                     return;
                 }
 
-                // Замените `userId` на реальный ID пользователя
-                const userId = 1; // Это временное значение, замените на реальное
+                const decodedToken = jwtDecode(token);
+                const userId = decodedToken.sub;
                 const response = await fetch(`${config.baseUrl}/api/channels/${userId}`, {
                     method: "GET",
                     headers: {
@@ -61,7 +62,7 @@ const Dashboard = ({ onLogout }) => {
                     {channels.map((channel) => (
                         <div key={channel.id} className="channel-item">
                             <div className="channel-item-avatar">
-                                <img src={channel.photoUrl || "https://i.imgur.com/eFV3Ep7.jpeg"} alt={channel.channelName} />
+                                <img src={"channel_avatars/"+channel.channelId+".jpg"} alt={channel.channelName} />
                             </div>
                             <div className="channel-item-info">
                                 <h3 className="channel-item-name">{channel.channelName}</h3>

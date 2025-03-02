@@ -40,7 +40,7 @@ public class UserController {
         UserDTO savedUser = userService.createOrUpdateUser(userDTO);
 
         // Генерируем JWT-токен (пример)
-        String token = jwtUtil.generateToken(savedUser.getUsername());
+        String token = jwtUtil.generateToken(savedUser.getId());
 
         // Возвращаем ответ с токеном и данными пользователя
         return new AuthResponse(token, savedUser);

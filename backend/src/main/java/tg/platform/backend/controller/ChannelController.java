@@ -34,4 +34,9 @@ public class ChannelController {
     public ChannelDTO updateChannel(@PathVariable Long channelId, @RequestBody ChannelDTO channelDTO) {
         return channelService.updateChannel(channelId, channelDTO);
     }
+
+    @GetMapping("/info")
+    public ChannelDTO getChannelInfoByName(@RequestParam String channelUrl) {
+        return channelService.getChannelInfoByName(channelUrl);
+    }
 }

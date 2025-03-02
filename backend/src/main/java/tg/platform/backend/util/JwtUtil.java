@@ -18,15 +18,15 @@ public class JwtUtil {
     private long expiration;
 
     // Генерация токена
-    public String generateToken(String username) {
+    public String generateToken(Long userId) {
         String token = Jwts.builder()
-                .setSubject(username)
+                .setSubject(userId.toString()) // Используем userId как subject
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
 
-        System.out.println("Generated token for " + username + ": " + token); // Логируем токен
+        System.out.println("Generated token for userId " + userId + ": " + token); // Логируем токен
         return token;
     }
 
@@ -43,8 +43,8 @@ public class JwtUtil {
         return getClaims(token).getExpiration().before(new Date());
     }
 
-    // Получение имени пользователя из токена
-    public String getUsername(String token) {
-        return getClaims(token).getSubject();
+    public Long getUserId(String token) {
+        String subject = getClaims(token).getSubject();
+        return Long.parseLong(subject); // Преобразуем subject в Long
     }
 }

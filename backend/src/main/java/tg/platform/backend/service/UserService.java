@@ -23,6 +23,7 @@ public class UserService {
         System.out.println(userDTO);
 
         userRepository.save(user);
+        userDTO.setId(user.getId());
 
         return userDTO;
     }
@@ -34,7 +35,8 @@ public class UserService {
                         user.getUsername(),
                         user.getFirstName(),
                         user.getLastName(),
-                        user.getPhotoUrl()
+                        user.getPhotoUrl(),
+                        user.getId()
                 ))
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }

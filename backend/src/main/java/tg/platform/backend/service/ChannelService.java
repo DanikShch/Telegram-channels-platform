@@ -1,13 +1,18 @@
 package tg.platform.backend.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import tg.platform.backend.dto.ChannelDTO;
+import tg.platform.backend.dto.ChannelInfoDTO;
 import tg.platform.backend.model.Channel;
 import tg.platform.backend.model.User;
 import tg.platform.backend.repository.ChannelRepository;
 import tg.platform.backend.repository.UserRepository;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +30,7 @@ public class ChannelService {
         Channel channel = new Channel();
         channel.setUser(user);
         channel.setChannelName(channelDTO.getChannelName());
+        channel.setChannelId(channelDTO.getChannelId());
         channel.setChannelUrl(channelDTO.getChannelUrl());
         channel.setDescription(channelDTO.getDescription());
         channel.setSubscribers(channelDTO.getSubscribers());
@@ -59,8 +65,10 @@ public class ChannelService {
         Channel existingChannel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new RuntimeException("Channel not found"));
 
+
         // Обновляем данные канала
         existingChannel.setChannelName(channelDTO.getChannelName());
+        existingChannel.setChannelId(channelDTO.getChannelId());
         existingChannel.setChannelUrl(channelDTO.getChannelUrl());
         existingChannel.setDescription(channelDTO.getDescription());
         existingChannel.setSubscribers(channelDTO.getSubscribers());
@@ -82,6 +90,7 @@ public class ChannelService {
     private ChannelDTO mapToDTO(Channel channel) {
         return new ChannelDTO(
                 channel.getId(),
+                channel.getChannelId(),
                 channel.getChannelName(),
                 channel.getChannelUrl(),
                 channel.getDescription(),
@@ -97,4 +106,40 @@ public class ChannelService {
                 channel.getSubscriberSource()
         );
     }
+
+    public ChannelDTO getChannelInfoByName(String channelUrl) {
+        ChannelDTO channelDTO = new ChannelDTO();
+        try {
+            Process process = new ProcessBuilder("python", "telethon_script.py", channelUrl).start();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), "windows-1251"));
+            StringBuilder jsonOutput = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                jsonOutput.append(line);
+            }
+            // Парсинг JSON
+            ObjectMapper objectMapper = new ObjectMapper();
+            ChannelInfoDTO channelInfo = objectMapper.readValue(jsonOutput.toString(), ChannelInfoDTO.class);
+            // Заполнение ChannelDTO
+            if (channelInfo.getError() != null) {
+                // Обработка ошибки
+                throw new RuntimeException("Python script error: " + channelInfo.getError());
+            } else {
+                channelDTO.setChannelName(channelInfo.getName());
+                channelDTO.setDescription(channelInfo.getDescription());
+                channelDTO.setSubscribers(channelInfo.getSubscribers());
+                channelDTO.setChannelId(channelInfo.getChannelId());
+                channelDTO.setChannelUrl(channelUrl);
+            }
+
+            int exitCode = process.waitFor();
+            System.out.println("Process exit code: " + exitCode);
+        } catch (Exception e) {
+            // Не обрабатываем исключение здесь, пробрасываем его выше
+            throw new RuntimeException("Error while getting channel info", e);
+        }
+        return channelDTO;
+    }
 }
+
