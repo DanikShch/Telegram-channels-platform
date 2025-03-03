@@ -51,7 +51,12 @@ Frontend будет доступен по адресу [http://localhost:5173](h
     mvn clean install
     ```
 
-3. Запустите сервер:
+3. Установите зависимости для Python:
+    ```bash
+    pip install telethon
+    ```
+
+4. Запустите сервер:
     ```bash
     mvn spring-boot:run
     ```
