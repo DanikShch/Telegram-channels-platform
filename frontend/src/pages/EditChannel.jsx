@@ -107,8 +107,10 @@ const EditChannel = () => {
         }));
     };
 
-    const handleFormatPriceChange = (format, price) => {
-        const updatedFormatPrices = { ...channelData.formatPrices, [format]: price };
+    const handleFormatPriceChange = (format, value) => {
+        // Разрешаем только цифры
+        const numericValue = value.replace(/[^0-9]/g, "");
+        const updatedFormatPrices = { ...channelData.formatPrices, [format]: numericValue };
         updateChannelData("formatPrices", updatedFormatPrices);
     };
 
@@ -173,7 +175,7 @@ const EditChannel = () => {
 
                 <div className="channel-card">
                     <div className="channel-avatar">
-                        <img src={"channel_avatars/" + channelData.channelId + ".jpg"} alt="Channel Avatar"/>
+                        <img src={"/channel_avatars/"+channelData.channelId+".jpg"} alt={channelData.channelId}/>
                     </div>
                     <div className="channel-info">
                         <h2 className="channel-name">{channelData.channelName}</h2>

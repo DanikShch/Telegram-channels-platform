@@ -96,8 +96,10 @@ const AddChannel = () => {
         }
     };
 
-    const handleFormatPriceChange = (format, price) => {
-        const updatedFormatPrices = { ...channelData.formatPrices, [format]: price };
+    const handleFormatPriceChange = (format, value) => {
+        // Разрешаем только цифры
+        const numericValue = value.replace(/[^0-9]/g, "");
+        const updatedFormatPrices = { ...channelData.formatPrices, [format]: numericValue };
         updateChannelData("formatPrices", updatedFormatPrices);
     };
 
@@ -157,7 +159,7 @@ const AddChannel = () => {
     const discountOptions = ["5%", "10%", "15%", "20%", "25%", "30%", "35%", "40%", "45%", "50%", "55%", "60%"];
     const regionOptions = ["Москва", "Санкт-Петербург", "Минск", "Гродно", "Киев", "Алматы"];
 
-    const avatar_path = `channel_avatars/${channelData.channelId}.jpg`;
+    const avatar_path = `/channel_avatars/${channelData.channelId}.jpg`;
     return (
         <div className={`add-channel-container ${fadeIn ? "fade-in" : ""}`}>
             <div className="add-channel-content">
