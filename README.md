@@ -11,6 +11,7 @@
 - Spring Boot (Java)
 - JWT (JSON Web Tokens)
 - Telegram API для проверки данных авторизации
+- Python (для работы с Telethon) 
 
 ## Установка
 
