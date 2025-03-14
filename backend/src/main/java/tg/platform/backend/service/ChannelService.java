@@ -122,7 +122,7 @@ public class ChannelService {
         try {
             Process process = new ProcessBuilder("python", "telethon_script.py", channelUrl).start();
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), "windows-1251"));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
             StringBuilder jsonOutput = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
