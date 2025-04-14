@@ -44,6 +44,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Разрешаем OPTIONS-запросы
                         .requestMatchers("/api/users/auth").permitAll() // Разрешаем доступ без токена
+                        .requestMatchers("/api/verify-moderator-password").permitAll()
+                        .requestMatchers("/api/channels").permitAll()
                         .anyRequest().authenticated() // Все остальные запросы требуют токена
                 )
                 .addFilterBefore(new JwtTokenFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class); // Добавляем JWT-фильтр

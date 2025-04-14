@@ -43,6 +43,7 @@ public class ChannelService {
         channel.setIsAuthorChannel(channelDTO.getIsAuthorChannel());
         channel.setSocialLinks(channelDTO.getSocialLinks());
         channel.setSubscriberSource(channelDTO.getSubscriberSource());
+        channel.setApproved(channelDTO.isApproved());
 
         Channel savedChannel = channelRepository.save(channel);
         return mapToDTO(savedChannel);
@@ -61,6 +62,14 @@ public class ChannelService {
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
+
+    public List<ChannelDTO> getApprovedChannels() {
+        List<Channel> approvedChannels = channelRepository.findByApprovedTrue();
+        return approvedChannels.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
 
     public void deleteChannel(Long channelId) {
         channelRepository.deleteById(channelId);
@@ -88,6 +97,7 @@ public class ChannelService {
         existingChannel.setIsAuthorChannel(channelDTO.getIsAuthorChannel());
         existingChannel.setSocialLinks(channelDTO.getSocialLinks());
         existingChannel.setSubscriberSource(channelDTO.getSubscriberSource());
+        existingChannel.setApproved(channelDTO.isApproved());
 
         // Сохраняем обновленный канал
         Channel updatedChannel = channelRepository.save(existingChannel);
@@ -110,9 +120,100 @@ public class ChannelService {
                 channel.getSelectedRegion(),
                 channel.getIsAuthorChannel(),
                 channel.getSocialLinks(),
-                channel.getSubscriberSource()
+                channel.getSubscriberSource(),
+                channel.getApproved()
         );
     }
+
+    public record SimpleChannelDTO(String channelName, String description) {}
+
+    public List<SimpleChannelDTO> getAllChannelsWithBasicInfo() {
+        List<Channel> channels = channelRepository.findAll();
+        return channels.stream()
+                .map(channel -> {
+                    try {
+                        return enrichSimpleChannelFromPython(channel.getChannelUrl());
+                    } catch (Exception e) {
+                        System.err.println("Failed to enrich channel: " + channel.getChannelUrl());
+                        return new SimpleChannelDTO(channel.getChannelName(), channel.getDescription());
+                    }
+                })
+                .collect(Collectors.toList());
+    }
+
+    private SimpleChannelDTO enrichSimpleChannelFromPython(String channelUrl) throws Exception {
+        Process process = new ProcessBuilder("python", "telethon_script.py", channelUrl).start();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
+        StringBuilder jsonOutput = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            jsonOutput.append(line);
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        ChannelInfoDTO channelInfo = objectMapper.readValue(jsonOutput.toString(), ChannelInfoDTO.class);
+
+        int exitCode = process.waitFor();
+        System.out.println("Process for " + channelUrl + " exited with code: " + exitCode);
+
+        if (channelInfo.getError() != null) {
+            throw new RuntimeException("Python script error: " + channelInfo.getError());
+        }
+
+        return new SimpleChannelDTO(channelInfo.getName(), channelInfo.getDescription());
+    }
+
+    public ChannelDTO approveChannel(String channelUrl) {
+        // Проверяем, существует ли канал с таким URL
+        if (channelRepository.existsByChannelUrl(channelUrl)) {
+            throw new RuntimeException("Channel already exists");
+        }
+
+        // Получаем информацию о канале через URL
+        ChannelDTO channelDTO = getChannelInfoByName(channelUrl);
+
+        // Находим канал по URL
+        Channel channel = new Channel();
+        channel.setChannelName(channelDTO.getChannelName());
+        channel.setChannelUrl(channelDTO.getChannelUrl());
+        channel.setDescription(channelDTO.getDescription());
+        channel.setSubscribers(channelDTO.getSubscribers());
+        channel.setChannelId(channelDTO.getChannelId());
+        channel.setApproved(true); // Устанавливаем статус "Одобрен"
+
+        // Сохраняем канал в базе данных
+        Channel savedChannel = channelRepository.save(channel);
+
+        return mapToDTO(savedChannel); // Возвращаем DTO одобренного канала
+    }
+
+    public ChannelDTO rejectChannel(String channelUrl) {
+        // Проверяем, существует ли канал с таким URL
+        if (channelRepository.existsByChannelUrl(channelUrl)) {
+            throw new RuntimeException("Channel already exists");
+        }
+
+        // Получаем информацию о канале через URL
+        ChannelDTO channelDTO = getChannelInfoByName(channelUrl);
+
+        // Находим канал по URL
+        Channel channel = new Channel();
+        channel.setChannelName(channelDTO.getChannelName());
+        channel.setChannelUrl(channelDTO.getChannelUrl());
+        channel.setDescription(channelDTO.getDescription());
+        channel.setSubscribers(channelDTO.getSubscribers());
+        channel.setChannelId(channelDTO.getChannelId());
+        channel.setApproved(false); // Устанавливаем статус "Отклонен"
+
+        // Сохраняем канал в базе данных
+        Channel savedChannel = channelRepository.save(channel);
+
+        return mapToDTO(savedChannel); // Возвращаем DTO отклоненного канала
+    }
+
+
+
+
 
     public ChannelDTO getChannelInfoByName(String channelUrl) {
         if(channelRepository.existsByChannelUrl(channelUrl)) {

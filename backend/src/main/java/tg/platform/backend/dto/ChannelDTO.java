@@ -25,4 +25,5 @@ public class ChannelDTO {
     private Boolean isAuthorChannel;
     private List<String> socialLinks;
     private String subscriberSource;
+    private boolean approved;
 }

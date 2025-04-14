@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 
 @Converter(autoApply = true)
-public class HashMapConverter implements AttributeConverter<Map<String, String>, String> {
+public class    HashMapConverter implements AttributeConverter<Map<String, String>, String> {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 

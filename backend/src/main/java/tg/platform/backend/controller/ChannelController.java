@@ -1,6 +1,7 @@
 package tg.platform.backend.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tg.platform.backend.dto.ChannelDTO;
 import tg.platform.backend.service.ChannelService;
@@ -18,6 +19,13 @@ public class ChannelController {
     public ChannelDTO addChannel(@PathVariable Long userId, @RequestBody ChannelDTO channelDTO) {
         return channelService.addChannel(userId, channelDTO);
     }
+
+    @GetMapping
+    public List<ChannelService.SimpleChannelDTO> getModerationChannelList() {
+        return channelService.getAllChannelsWithBasicInfo();
+    }
+
+
 
     @GetMapping("/{userId}")
     public List<ChannelDTO> getChannelsByUserId(@PathVariable Long userId) {
@@ -38,6 +46,33 @@ public class ChannelController {
     @PutMapping("/{channelId}")
     public ChannelDTO updateChannel(@PathVariable Long channelId, @RequestBody ChannelDTO channelDTO) {
         return channelService.updateChannel(channelId, channelDTO);
+    }
+
+    @GetMapping("/channels/approved")
+    public List<ChannelDTO> getApprovedChannels() {
+        return channelService.getApprovedChannels();
+    }
+
+
+    @PutMapping("/approve")
+    public ResponseEntity<ChannelDTO> approveChannel(@RequestBody String channelUrl) {
+        try {
+            ChannelDTO updatedChannel = channelService.approveChannel(channelUrl);
+            return ResponseEntity.ok(updatedChannel);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(null); // Вернуть ошибку, если канал не найден или возникла ошибка
+        }
+    }
+
+    // Метод для отклонения канала
+    @PutMapping("/reject")
+    public ResponseEntity<ChannelDTO> rejectChannel(@RequestBody String channelUrl) {
+        try {
+            ChannelDTO updatedChannel = channelService.rejectChannel(channelUrl);
+            return ResponseEntity.ok(updatedChannel);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(null); // Вернуть ошибку, если канал не найден или возникла ошибка
+        }
     }
 
     @GetMapping("/info")

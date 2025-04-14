@@ -1,5 +1,5 @@
 const config = {
-    baseUrl: 'https://fragrantly-allowing-sabertooth.cloudpub.ru',
-    botName: 'tgauth4bot'
+    baseUrl: 'https://indignantly-flashy-peacock.cloudpub.ru',
+    botName: 'Jaleikobot'
 };
 export default config;

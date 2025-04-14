@@ -71,4 +71,7 @@ public class Channel {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "approved")
+    private Boolean approved = false;
 }
