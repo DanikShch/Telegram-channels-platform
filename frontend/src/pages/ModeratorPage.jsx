@@ -30,17 +30,17 @@ function ModeratorPage() {
         fetchChannels();
     }, []);
 
-    const handleApproveChannel = async (channelUrl) => {
+    const handleApproveChannel = async (channelName) => {
         const token = localStorage.getItem("jwtToken");
 
         try {
-            const response = await fetch(`${config.baseUrl}/api/channels/approve`, {
+            const response = await fetch(`${config.baseUrl}/api/channels/approve/${channelName}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ channelUrl }),
+                body: JSON.stringify({ channelName }),
             });
 
             if (response.ok) {
@@ -64,7 +64,7 @@ function ModeratorPage() {
         const token = localStorage.getItem("jwtToken");
 
         try {
-            const response = await fetch(`${config.baseUrl}/api/channels/reject`, {
+            const response = await fetch(`${config.baseUrl}/api/channels/reject/${channelUrl}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -111,13 +111,13 @@ function ModeratorPage() {
                                     <div className="channel-item-actions">
                                         <button
                                             className="approve-channel-btn"
-                                            onClick={() => handleApproveChannel(channel.id)}
+                                            onClick={() => handleApproveChannel(channel.channelName)}
                                         >
                                             Одобрить
                                         </button>
                                         <button
                                             className="reject-channel-btn"
-                                            onClick={() => handleRejectChannel(channel.id)}
+                                            onClick={() => handleRejectChannel(channel.channelName)}
                                         >
                                             Отклонить
                                         </button>

@@ -10,6 +10,10 @@ public interface ChannelRepository extends JpaRepository<Channel, Long> {
 
     List<Channel> findByApprovedTrue();
 
+    Channel findByChannelUrl(String channelUrl);
+
+    Channel findByChannelName(String channelName);
+
 
     Boolean existsByChannelUrl(String channelUrl);
 }

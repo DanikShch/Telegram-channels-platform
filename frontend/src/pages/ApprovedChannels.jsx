@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import config from "../config/config";
+import "./ApprovedChannels.css";
 
 function ApprovedChannels() {
     const [channels, setChannels] = useState([]);
@@ -28,7 +29,7 @@ function ApprovedChannels() {
             {channels.length === 0 ? (
                 <p>Пока нет одобренных каналов</p>
             ) : (
-                <div className="channels-list">
+                <div className="channels-list1">
                     {channels.map((channel) => (
                         <div key={channel.id} className="channel-item">
                             <h3>{channel.channelName}</h3>

@@ -48,14 +48,14 @@ public class ChannelController {
         return channelService.updateChannel(channelId, channelDTO);
     }
 
-    @GetMapping("/channels/approved")
+    @GetMapping("/approved")
     public List<ChannelDTO> getApprovedChannels() {
         return channelService.getApprovedChannels();
     }
 
 
-    @PutMapping("/approve")
-    public ResponseEntity<ChannelDTO> approveChannel(@RequestBody String channelUrl) {
+    @PutMapping("/approve/{channelUrl}")
+    public ResponseEntity<ChannelDTO> approveChannel(@PathVariable String channelUrl) {
         try {
             ChannelDTO updatedChannel = channelService.approveChannel(channelUrl);
             return ResponseEntity.ok(updatedChannel);
@@ -65,8 +65,8 @@ public class ChannelController {
     }
 
     // Метод для отклонения канала
-    @PutMapping("/reject")
-    public ResponseEntity<ChannelDTO> rejectChannel(@RequestBody String channelUrl) {
+    @PutMapping("/reject/{channelUrl}")
+    public ResponseEntity<ChannelDTO> rejectChannel(@PathVariable String channelUrl) {
         try {
             ChannelDTO updatedChannel = channelService.rejectChannel(channelUrl);
             return ResponseEntity.ok(updatedChannel);

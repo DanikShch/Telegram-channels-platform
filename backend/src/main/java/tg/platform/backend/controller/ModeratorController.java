@@ -16,7 +16,7 @@ import tg.platform.backend.dto.PasswordRequest;
 @RequestMapping("/api")
 public class ModeratorController {
 
-  private static final String MODERATOR_PASSWORD = "supersecretpassword"; // можешь потом вынести в .properties
+  private static final String MODERATOR_PASSWORD = "a"; // можешь потом вынести в .properties
 
   @PostMapping("/verify-moderator-password")
   public void verifyModeratorPassword(@RequestBody PasswordRequest passwordRequest,

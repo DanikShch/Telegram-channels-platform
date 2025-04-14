@@ -41,13 +41,13 @@ h1 {
 .subtitle {
   color: #94a3b8;
   font-size: 1rem;
-  line-height: 1.5;
+  line-height: 1;
 }
 
 .card-content {
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
+  gap: 1rem;
 }
 
 .protected-data-btn {

@@ -116,7 +116,9 @@ function App() {
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                         />
-                                        <button onClick={handleModeratorPasswordSubmit}>
+                                        <button
+                                            className="protected-data-btn"
+                                            onClick={handleModeratorPasswordSubmit}>
                                             Submit
                                         </button>
                                     </div>
@@ -127,6 +129,7 @@ function App() {
                                         <Link to="/dashboard" className="dashboard-btn">
                                             Dashboard
                                         </Link>
+
                                         <Link to="/approved-channels" className="dashboard-btn">
                                             Посмотреть каналы
                                         </Link>

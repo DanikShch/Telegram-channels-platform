@@ -46,6 +46,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/auth").permitAll() // Разрешаем доступ без токена
                         .requestMatchers("/api/verify-moderator-password").permitAll()
                         .requestMatchers("/api/channels").permitAll()
+                        .requestMatchers("/api/channels/approve").permitAll()
+                        .requestMatchers("/api/channels/approved").permitAll()
+                        .requestMatchers("/api/channels/reject").permitAll()
                         .anyRequest().authenticated() // Все остальные запросы требуют токена
                 )
                 .addFilterBefore(new JwtTokenFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class); // Добавляем JWT-фильтр

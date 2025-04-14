@@ -163,22 +163,11 @@ public class ChannelService {
         return new SimpleChannelDTO(channelInfo.getName(), channelInfo.getDescription());
     }
 
-    public ChannelDTO approveChannel(String channelUrl) {
-        // Проверяем, существует ли канал с таким URL
-        if (channelRepository.existsByChannelUrl(channelUrl)) {
-            throw new RuntimeException("Channel already exists");
-        }
+    public ChannelDTO approveChannel(String channelName) {
 
-        // Получаем информацию о канале через URL
-        ChannelDTO channelDTO = getChannelInfoByName(channelUrl);
 
         // Находим канал по URL
-        Channel channel = new Channel();
-        channel.setChannelName(channelDTO.getChannelName());
-        channel.setChannelUrl(channelDTO.getChannelUrl());
-        channel.setDescription(channelDTO.getDescription());
-        channel.setSubscribers(channelDTO.getSubscribers());
-        channel.setChannelId(channelDTO.getChannelId());
+        Channel channel = channelRepository.findByChannelName(channelName);
         channel.setApproved(true); // Устанавливаем статус "Одобрен"
 
         // Сохраняем канал в базе данных
@@ -187,28 +176,14 @@ public class ChannelService {
         return mapToDTO(savedChannel); // Возвращаем DTO одобренного канала
     }
 
-    public ChannelDTO rejectChannel(String channelUrl) {
-        // Проверяем, существует ли канал с таким URL
-        if (channelRepository.existsByChannelUrl(channelUrl)) {
-            throw new RuntimeException("Channel already exists");
-        }
-
-        // Получаем информацию о канале через URL
-        ChannelDTO channelDTO = getChannelInfoByName(channelUrl);
-
-        // Находим канал по URL
-        Channel channel = new Channel();
-        channel.setChannelName(channelDTO.getChannelName());
-        channel.setChannelUrl(channelDTO.getChannelUrl());
-        channel.setDescription(channelDTO.getDescription());
-        channel.setSubscribers(channelDTO.getSubscribers());
-        channel.setChannelId(channelDTO.getChannelId());
-        channel.setApproved(false); // Устанавливаем статус "Отклонен"
+    public ChannelDTO rejectChannel(String channelName) {
+        Channel channel = channelRepository.findByChannelName(channelName);
+        channel.setApproved(false); // Устанавливаем статус "Одобрен"
 
         // Сохраняем канал в базе данных
         Channel savedChannel = channelRepository.save(channel);
 
-        return mapToDTO(savedChannel); // Возвращаем DTO отклоненного канала
+        return mapToDTO(savedChannel); // Возвращаем DTO одобренного канала
     }
 
 
